@@ -14,13 +14,13 @@ class FetchDetailsRepo(private val fetchDetailsAPI: FetchDetailsAPI) {
     suspend fun fetchDetailsFlow(): Flow<Resource<DogBreed>> {
         return flow {
             emit(handleException { fetchDetailsAPI.fetchBreedListFlow() })
-        }.flowOn(Dispatchers.IO)
+        }
     }
 
     suspend fun fetchBreedDetailsFlow(id: Int): Flow<BreedDetail> {
         return flow {
             emit(fetchDetailsAPI.fetchBreedDetailsFlow(id) )
-        }.flowOn(Dispatchers.IO)
+        }
     }
 }
 

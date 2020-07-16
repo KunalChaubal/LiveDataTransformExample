@@ -5,8 +5,10 @@ import androidx.databinding.ObservableField
 import androidx.lifecycle.*
 import com.transformations.sample.data.remote.example.FetchDetailsRepo
 import com.transformations.sample.data.remote.model.Resource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 
 class FetchDetailsViewModel(
@@ -20,6 +22,7 @@ class FetchDetailsViewModel(
     fun fetchDogBreedList(): LiveData<List<String>?> {
         return liveData {
             fetchDetailsRepo.fetchDetailsFlow()
+                .flowOn(Dispatchers.IO)
                 .collect {
                     when (it.status) {
                         Resource.Status.SUCCESS -> {
@@ -36,6 +39,7 @@ class FetchDetailsViewModel(
     fun fetchBreedDetails(id: Int) {
         viewModelScope.launch {
             fetchDetailsRepo.fetchBreedDetailsFlow(id + 1)
+                .flowOn(Dispatchers.IO)
                 .catch { error -> Log.i(logTag, "Error: $error")  }
                 .collect {
                     val resultString = "-------Details-------\n" +
