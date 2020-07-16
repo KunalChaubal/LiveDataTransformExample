@@ -1,55 +1,50 @@
 package com.transformations.sample.ui.example
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
+import android.util.Log
+import androidx.databinding.ObservableField
+import androidx.lifecycle.*
 import com.transformations.sample.data.remote.example.FetchDetailsRepo
 import com.transformations.sample.data.remote.model.Resource
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 class FetchDetailsViewModel(
     private val fetchDetailsRepo: FetchDetailsRepo
 ) : ViewModel() {
 
-    val selectedBreedLiveData = MutableLiveData<Int>()
+    val breedDetailObservable = ObservableField<String>()
 
-    fun fetchDogBreedList(): LiveData<List<String>> {
-        return Transformations.map(fetchDetailsRepo.fetchDetails()) {
-            when (it.status) {
-                Resource.Status.SUCCESS -> {
-                    it.data?.map { it.name }
+    private val logTag = "FetchDetailsViewModel"
+
+    fun fetchDogBreedList(): LiveData<List<String>?> {
+        return liveData {
+            fetchDetailsRepo.fetchDetailsFlow()
+                .collect {
+                    when (it.status) {
+                        Resource.Status.SUCCESS -> {
+                            emit(it.data?.map { it.name })
+                        }
+                        Resource.Status.ERROR -> {
+                            Log.i(logTag, "Error: ${it.getErrorMessage()}")
+                        }
+                    }
                 }
-                Resource.Status.ERROR -> {
-                    // Handle Error
-                    null
-                }
-            }
         }
     }
 
-    fun fetchBreedDetails(): LiveData<String> {
-        return Transformations.switchMap(selectedBreedLiveData)
-        {
-            makeDetailsApiCall(it + 1)
-            // Make any additional transformations here, if needed
-        }
-    }
-
-    private fun makeDetailsApiCall(id: Int): LiveData<String> {
-        return Transformations.map(fetchDetailsRepo.fetchBreedDetails(id)) {
-            when (it.status) {
-                Resource.Status.SUCCESS -> {
-                    "-------Details-------\n" +
-                    "Name: ${it.data?.name}\n" +
-                    "Bred For: ${it.data?.bredFor}\n" +
-                    "Breed Group: ${it.data?.breedGroup}\n" +
-                    "LifeSpan: ${it.data?.lifeSpan}\n"
+    fun fetchBreedDetails(id: Int) {
+        viewModelScope.launch {
+            fetchDetailsRepo.fetchBreedDetailsFlow(id + 1)
+                .catch { error -> Log.i(logTag, "Error: $error")  }
+                .collect {
+                    val resultString = "-------Details-------\n" +
+                            "Name: ${it.name}\n" +
+                            "Bred For: ${it.bredFor}\n" +
+                            "Breed Group: ${it.breedGroup}\n" +
+                            "LifeSpan: ${it.lifeSpan}\n"
+                    breedDetailObservable.set(resultString)
                 }
-                Resource.Status.ERROR -> {
-                    // Handle Error
-                    null
-                }
-            }
         }
     }
 }

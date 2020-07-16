@@ -41,6 +41,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime:$archComp"
     implementation "androidx.lifecycle:lifecycle-extensions:$archExt"
     implementation "androidx.lifecycle:lifecycle-common:$archComp"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$viewModelKtx"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$liveDataKtx"
 
     //Appcompat
     implementation "androidx.appcompat:appcompat:$appCompat"
@@ -58,4 +60,7 @@ dependencies {
     implementation "com.google.code.gson:gson:$gson"
     implementation "com.squareup.retrofit2:converter-gson:$gsonConverter"
     implementation "com.squareup.okhttp3:logging-interceptor:$httpLogging"
+
+    //Coroutines
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines"
 }

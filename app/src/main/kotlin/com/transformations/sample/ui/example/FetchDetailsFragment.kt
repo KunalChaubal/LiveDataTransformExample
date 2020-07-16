@@ -38,7 +38,7 @@ class FetchDetailsFragment : DataBindingFragment<FragmentFetchDetailsBinding>() 
                 parent: AdapterView<*>,
                 view: View, position: Int, id: Long
             ) {
-                vm.selectedBreedLiveData.value = position
+                vm.fetchBreedDetails(position)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
@@ -54,10 +54,6 @@ class FetchDetailsFragment : DataBindingFragment<FragmentFetchDetailsBinding>() 
                 aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 vb.spinner.adapter = aa
             }
-        })
-
-        vm.fetchBreedDetails().observe(viewLifecycleOwner, Observer {
-            vb.tvDetails.text = it
         })
     }
 }

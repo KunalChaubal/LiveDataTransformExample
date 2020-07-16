@@ -42,4 +42,7 @@ ext {
     stickyheaders = '0.5.0'
     koin = '2.0.1'
     constraintLayout = '2.0.0-beta6'
+    coroutines = '1.3.7'
+    viewModelKtx = '2.2.0'
+    liveDataKtx = '2.2.0'
 }
